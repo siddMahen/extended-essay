@@ -1,0 +1,5 @@
+.DS_Store
+LaTeX/*.log
+LaTeX/*.dvi
+LaTeX/*.aux
+LaTeX/*.out
