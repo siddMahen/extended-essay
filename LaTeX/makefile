@@ -5,6 +5,8 @@ render: build
 
 build:
 	latex $(DOC)
+	bibtex $(DOC)
+	latex $(DOC)
 	pdflatex $(DOC)
 
 clean:

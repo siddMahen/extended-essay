@@ -1,0 +1,6 @@
+\contentsline {section}{\numberline {1.0}Introduction}{1}{section.0.1}
+\contentsline {section}{\numberline {2.0}Matroid Theory}{2}{section.0.2}
+\contentsline {section}{\numberline {3.0}Greedy Algorithms and Matroids}{2}{section.0.3}
+\contentsline {section}{\numberline {4.0}Optimality}{2}{section.0.4}
+\contentsline {section}{\numberline {5.0}Example: Kruskals Algorithm}{2}{section.0.5}
+\contentsline {section}{References}{3}{section*.2}
