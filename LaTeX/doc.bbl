@@ -1,3 +1,20 @@
-\begin{thebibliography}{}
+\begin{thebibliography}{1}
+
+\bibitem{clrs}
+Thomas~H. Cormen, Charles~E. Leiserson, Ronald~L. Rivest, and Clifford Stein.
+\newblock {\em {Introduction to Algorithms}}.
+\newblock The MIT Press, 55 Hayward Street, Cambridge, Massachusetts, third
+  edition, 2009.
+
+\bibitem{greedy-tsp}
+G.~Gutin, A.~Yeo, and A.~Zverovich.
+\newblock {Traveling salesman should not be greedy: domination analysis of
+  greedy-type heuristics for TSP}.
+\newblock {\em Discrete Applied Mathematics}, (117):81--86, 2002.
+
+\bibitem{matroid-theory}
+James~G. Oxley.
+\newblock {\em {Matroid Theory}}.
+\newblock Oxford University Press, New York, 1992.
 
 \end{thebibliography}

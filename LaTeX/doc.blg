@@ -3,44 +3,46 @@ Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: doc.aux
 The style file: plain.bst
 Database file #1: doc.bib.bib
-You've used 0 entries,
+Warning--there's a number but no volume in greedy-tsp
+You've used 3 entries,
             2118 wiz_defined-function locations,
-            497 strings with 3986 characters,
-and the built_in function-call counts, 18 in all, are:
-= -- 0
-> -- 0
+            517 strings with 4434 characters,
+and the built_in function-call counts, 912 in all, are:
+= -- 84
+> -- 48
 < -- 0
-+ -- 0
-- -- 0
-* -- 2
-:= -- 7
-add.period$ -- 0
-call.type$ -- 0
-change.case$ -- 0
++ -- 19
+- -- 16
+* -- 65
+:= -- 165
+add.period$ -- 9
+call.type$ -- 3
+change.case$ -- 16
 chr.to.int$ -- 0
-cite$ -- 0
-duplicate$ -- 0
-empty$ -- 1
-format.name$ -- 0
-if$ -- 1
+cite$ -- 4
+duplicate$ -- 35
+empty$ -- 70
+format.name$ -- 16
+if$ -- 183
 int.to.chr$ -- 0
-int.to.str$ -- 0
-missing$ -- 0
-newline$ -- 3
-num.names$ -- 0
-pop$ -- 0
+int.to.str$ -- 3
+missing$ -- 5
+newline$ -- 18
+num.names$ -- 6
+pop$ -- 21
 preamble$ -- 1
-purify$ -- 0
+purify$ -- 14
 quote$ -- 0
-skip$ -- 1
+skip$ -- 17
 stack$ -- 0
-substring$ -- 0
-swap$ -- 0
+substring$ -- 34
+swap$ -- 3
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 0
-warning$ -- 0
-while$ -- 0
-width$ -- 0
-write$ -- 2
+type$ -- 8
+warning$ -- 1
+while$ -- 8
+width$ -- 4
+write$ -- 36
+(There was 1 warning)

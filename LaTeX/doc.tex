@@ -2,16 +2,65 @@
 
 % -- Typography --
 \usepackage[utf8]{inputenc}
-\usepackage{microtype}
-%\usepackage{parskip}
+\usepackage[%
+    tracking=true,%
+    kerning=true,%
+    selected=true,%
+    stretch=20,%
+    shrink=20,%
+]{microtype}
 
-% -- Fonts --
-%\usepackage{charter}
-%\usepackage{palatino}
+% enable french spacing?
+% yes, extra spacing is almost unnoticable yet allows
+% the reader the slightest pause between sentances.
+
+% -- Misc. --
+\usepackage{aliascnt}
+\usepackage{hyperref}
+\usepackage{color}
+\usepackage{array}
+\usepackage{url}
+
+% -- TOC --
+\usepackage[nottoc,section]{tocbibind}
+\usepackage{tocloft}
 
 % -- Math --
+\usepackage[mathscr]{eucal}
+\usepackage{amssymb}
 \usepackage{amsmath}
 \usepackage{amsthm}
+
+\theoremstyle{plain}
+\newtheorem{thm}{Theorem}[section]
+
+% make sure counters across everything sync up
+\newaliascnt{lem}{thm}
+\newaliascnt{prp}{thm}
+\newaliascnt{defn}{thm}
+
+\newtheorem{lem}[lem]{Lemma}
+\newtheorem{prp}[prp]{Proposition}
+
+% fix the definition style to bold the note text properly
+\newtheoremstyle{definition}%
+{}{}{\normalfont}{}{\bfseries}{.}{0.5em}%
+{#1 #2\thmnote{ (#3)}}
+
+\theoremstyle{definition}
+\newtheorem{defn}[defn]{Definition}
+
+\aliascntresetthe{lem}
+\aliascntresetthe{prp}
+\aliascntresetthe{defn}
+
+\providecommand*{\lemautorefname}{Lemma}
+\providecommand*{\prpautorefname}{Proposition}
+\providecommand*{\defnautorefname}{Definition}
+
+% convinience commands
+\newcommand{\I}{\mathcal{I}}
+\newcommand{\B}{\mathscr{B}}
 
 % -- Tables --
 \usepackage{booktabs}
@@ -19,18 +68,7 @@
 % -- Graphics --
 \usepackage{pgfplots}
 
-% -- TOC --
-\usepackage[nottoc,section]{tocbibind}
-\usepackage[titles]{tocloft}
-
-% -- Misc. --
-\usepackage{hyperref}
-\usepackage{color}
-\usepackage{array}
-\usepackage{url}
-
 \begin{document}
-
 
 \title{Matroids and Greedy Algorithms}
 \author{Siddharth Mahendraker}
@@ -38,22 +76,31 @@
 \maketitle
 
 \begin{abstract}
-This is the abstract.
+In this paper, we examine the necessary and sufficient conditions for a
+greedy algorithm strategy to be successful for a given combinatorial
+optimization problem. This is done through the study of matroids and their
+properties. We show that a greedy algorithm is successful for a given problem
+if and only if the problem has can be formulated as a matroid.
 \end{abstract}
 
 % -- Bookkeeping --
 \setcounter{secnumdepth}{3}
-\renewcommand{\thesection}{\arabic{section}.0}
-\renewcommand{\cftsecfont}{\bfseries}
-\settocbibname{References}
-\setlength\cftbeforesecskip{3pt}
-\setlength\cftbeforesubsecskip{3pt}
+\renewcommand{\thesection}{\arabic{section}}
 
 % -- TOC --
+\renewcommand{\cfttoctitlefont}{\Large\bfseries}
+\setlength\cftaftertoctitleskip{1em}
+
+\setlength\cftbeforesecskip{0.5em}
+
+\settocbibname{References}
+
 \setcounter{page}{1}
 \pagenumbering{roman}
+
 \tableofcontents
 \clearpage
+
 \setcounter{page}{1}
 \pagenumbering{arabic}
 
@@ -62,69 +109,293 @@ This is the abstract.
 
 Combinatorial optimization is a mathematical framework for finding optimal
 objects amongst a large set of objects. A famous example of a combinatorial
-optimization problem is the traveling salesman problem, or TSP. Assume a
-salesman has a list of cities he wants to vist, and knows the distance
-between various pairs of cities. The TSP asks: What is the shortest path
-which takes the salesman through each city once and back to his starting
-point? Here, the optimal object is a shortest path which passes through each
-city once and returns the salesman to his point of departure, and the set of
-objects is the set of all paths which can be taken. To see why this problem
-could be difficult, assume that every city is connected to every other city
-and we want to check all the paths to find the shortest one. If we fix a
-city of departure, there are $n-1$ cities left to go to, where $n$ is the
-total number of cities. Each of these choices represents a different path
-the salesman could take. In the next city, there are $n-2$ cities to left to
-go to, and so on. It turns out, given $n$ cities there are $(n-1)!/2$ unique
-paths which reach every city and return the salesman to his point of
-departure. Even for relatively small values of $n$, the number of possible
-paths is enourmous; far larger than anything even a computer could hope to
-check. Consider for example the choice of $n = 64$. In this case, there are
-over $10^{86}$ possible paths to check! More paths than there are atoms in
-the universe! Using combinatorial optimization techniques, however, we can
-significantly reduce the amount of work needed to find an optimal path.
-Indeed, to date, instances of the TSP have been solved with tens of thousands
-of cities.
+optimization problem is the travelling salesman problem, or TSP\@. Assume a
+salesman has a list of cities he wants to visit, and knows the distance between
+various pairs of cities. The TSP asks: What is the shortest path which takes
+the salesman through each city once and back to his starting point? Here, the
+optimal object is a shortest path which passes through each city once and
+returns the salesman to his point of departure, and the set of objects is the
+set of all paths which can be taken. To see why this problem could be
+difficult, assume that every city is connected to every other city and we want
+to check all the paths to find the shortest one. If we fix a city of departure,
+there are $n-1$ cities left to go to, where $n$ is the total number of cities.
+Each of these choices represents a different path the salesman could take. In
+the next city, there are $n-2$ cities left to go to, and so on. It turns out,
+given $n$ cities there are $(n-1)!/2$ unique paths which reach every city and
+return the salesman to his point of departure. Even for relatively small values
+of $n$, the number of possible paths is enormous; far larger than anything even
+a computer could hope to check. Consider for example the choice of $n = 64$. In
+this case, there are over $10^{86}$ possible paths to check! More paths than
+there are atoms in the universe! Using combinatorial optimization techniques,
+however, we can significantly reduce the amount of work needed to find an
+optimal path.  Indeed, to date, instances of the TSP have been solved with tens
+of thousands of cities.
 
 One particular strategy often used in combinatorial optimization is the greedy
 optimization strategy, or greedy algorithm. The greedy algorithm attempts to
-find the optimal object by making succesive locally optimal decisions, in the
+find the optimal object by making successive locally optimal decisions, in the
 hopes that this will lead to a globally optimal solution. For example, a greedy
-algorithm for the TSP could work as follows: Fix the city of departure.
-To reach another city, pick the shortest route out of the current city which
-leads to an unvisited city. Repeat until you return to the city of departure.
+algorithm for the TSP could work as follows: Fix the city of departure.  To
+reach another city, pick the shortest route out of the current city which leads
+to an unvisited city. Repeat until you return to the city of departure.
 Unfortunately, greedy strategies are often non-optimal. In the case of the TSP,
 this particular greedy algorithm will not yield the optimal path, and in
 certain situations, can in fact give the worst possible solution. More
-generally, it is known that there do not exist greedy algorithms which yield
-optimal solutions to the TSP.
+generally, it is known that greedy algorithms are far from optimal for most
+instances of the TSP \cite{greedy-tsp}.
 
 %% Need citations here
 
-However, for certain combinatorial optimization problems, greedy algorithms
-can be very useful. If they can be proven to be optimal, greedy algorithms
-are often far simpler to implement than other combinatorial optimization
-strategies, such as dynamic programming. Furthermore, they often consume
-less resources when implemented on a computer and thus run faster and more
-efficiently. Therefore, knowing when a greedy algorithm can be applied is
-very useful.
+However, for certain combinatorial optimization problems, greedy algorithms can
+be very useful. If they can be proven to be correct, greedy algorithms are
+often far simpler to implement than other combinatorial optimization
+strategies, such as dynamic programming. Furthermore, they often consume less
+resources when implemented on a computer and thus run faster and more
+efficiently. Therefore, knowing when a greedy algorithm can be applied is very
+useful.
 
-In this paper, we examine the necessary and sufficient conditions for a
-greedy algorithm strategy to be optimal. This is done through the study
-of matroids and their properties, which as we shall soon see, lead naturally
-to greedy algorithm strategies.
+In this paper, we examine the necessary and sufficient conditions required for
+a greedy algorithm strategy to be successful for a given combinatorial
+optimization problem. This is done through the study of matroids and their
+properties, which as we shall soon see, lead naturally to greedy algorithm
+strategies.
 
-% Outline what happens in each section
+The remainder of this paper will proceed as follows. First, we give an example
+of an successful greedy algorithm by examining the minimum spanning tree
+problem and Kruskal's algorithm. Next we introduce matroids and discuss their
+various forms and properties. Then we link certain properties of matroids to
+solutions to a general class of combinatorial optimization problems. Finally,
+we show that these solutions can be obtained through greedy stratagies.
+
+%% Better outline...
+
+\section{The MSTP and Kruskal's Algorithm}
+
+Another well known problem in combinatorial optimization is the minimum
+spanning tree problem, or MSTP\@. Given a weighted graph $G = (V,E,w)$, the
+MSTP asks us to find an acyclic subgraph $H = (V,E',w)$ of $G$, such that $H$
+contains all the vertices of $G$ and the weight of $H$, $w(H) = \sum_{e \in
+E'}{w(e)}$ is minimal.
+
+Unlike the TSP, the MSTP can be solved with a simple and elegant algorithm,
+due to Kruskal \cite{clrs}.
+
+% comma necessary here?
+
+\begin{defn}[Kruskal's Algorithm]
+Given a graph $G = (V,E,w)$, the minimum spanning tree $T^*$ of
+$G$ can be computed as follows:
+\begin{enumerate}
+    \item Begin with an empty set $T := \emptyset$.
+    \item Until $|T| = |V| - 1$, repeat steps 3 and 4 below.
+    \item Select a minimum cost edge $e$ in $E - T$, breaking ties
+    arbitrarily.
+    \item If $T \cup e$ is acyclic, set $T := T \cup e$. Otherwise discard
+    the edge $e$ and never consider it again.
+    \item Output a minimum spanning tree $T^* = (V,T,w)$.
+\end{enumerate}
+\end{defn}
+
+Note that due to our frequent addition and removal of single elements from
+sets, we abbreviate $X \cup \{e\}$ to $X \cup e$ and $X - \{e\}$ to $X - e$.
+
+Clearly, Kruskal's algorithm is greedy. At every step, the algorithm
+selects a minimum weight edge in $G$, and attempts to add it to the edge set
+of the output spanning tree.
+
+%% Give an example of Kruskal's algorithm at work
+
+\begin{defn}
+An algorithm is called a \emph{greedy algorithm} if it makes a locally optimal
+decision at each step.
+\end{defn}
+
+Kruskal's algorithm shows how efficient greedy algorithms can be, given the
+correct problem structure. Intuitively, Kruskal's algorithm works because
+given any subset $S$ of the vertex set of a graph $G$, an MST of
+the subgraph induced by $S$ will always be a part of an MST of $G$.
+Furthermore, if an edge $e$ is a minimum weight edge across all edges, it
+must be part of some MST of $G$.
+
+In the next section we introduce matroids, which generalize certain properties
+of the MSTP mentioned above. We will revisit Kruskal's algorithm in
+subsequent sections and provide a more rigorous proof of correctness using
+matroid theory.
+
+%Intuitively, Kruskal's algorithm works because if $e$ is a minimum cost edge
+%across all edges, it must be part of some MST of $G$. If we assume all the
+%edges of $G$ have distinct weights, we can order the edges like so:
+%$e_1 < e_2 < \ldots < e_{n-1} < e_n$. Then, we simply need to select a set of
+%lowest cost edges in this ordering which do not create a cycle, and span the
+%vertex set. This essentially solves the MSTP\@. We will prove the correctness
+%of Kruskal's algorithm more rigorously using matroid theory in subsequent
+%sections.
 
 \section{Matroid Theory}
 
+Intuitively, matroids consolidate various ideas of dependence which
+arises naturally in certain fields of mathematics, particularly linear
+algebra and graph theory. In linear algebra, a set of vectors $U$ of a
+vector space $V$ is called dependent if there is a linear of combination of
+these vectors which sum to $0$. In graph theory, a set of edges $S$ of a
+graph $G$ is called dependent if the edges of $S$ contain a cycle.
+
+An interesting property of matroids is that there are several equivalent
+axiom systems which can be used to reason about them. In this essay, we
+will only explore two such axiom systems: the independent set system, and
+the bases system. For a more thorough overview of matroid theory, see
+\cite{matroid-theory}.
+
+\begin{defn}
+A \emph{matroid} $M$ is an ordered pair $(E, \I)$, where $E$ is a finite
+set and $\I$ is a collection of subsets of $E$ satisfying the
+following three conditions:
+\begin{description}
+    \item[(I1)] $\emptyset$ is in $\I$.
+    \item[(I2)] If $I \in \I$ and $I' \subseteq I$, then $I' \in
+                \I$.
+    \item[(I3)] If $I_1$ and $I_2$ are in $\I$ and $|I_1| < |I_2|$,
+                then there exists an element $e \in I_2 - I_1$ such that
+                $I_1 \cup e \in \I$.
+\end{description}
+\end{defn}
+
+We call $E$ the \emph{ground set} of a matroid $M = (E, \I)$ and we call
+the members of $\I$ the \emph{independent sets} of $M$. A subset $S$ of $E$
+which is not in $\I$ is called a \emph{dependent set}. We also call (I2)
+the \emph{hereditary property} and (I3) the \emph{exchange property}.
+
+From this definition, we can already intuitively see that matroids
+encapsulate lots of structure which is important in solving combinatorial
+optimization problems. Specifically, (I2) and (I3) are reminiscent of the
+overlapping subproblem structure and optimal substructure exploited by
+dynamic programming algorithms \cite{clrs}. That is, we are guaranteed
+that all subsets of an independent set are themselves independent, and that
+we can always build larger independent sets from smaller ones.
+
+\begin{prp}\label{graphs-are-matroids}
+Let $G = (V,E)$ be a graph and let $\I$ be the set of subsets of $E$ which
+do not contain a cycle. Then $M = (E,\I)$ is a matroid.
+
+\begin{proof}
+By definition, $\emptyset \in \I$ and thus $\I$ satisfies (I1). It is evident
+that if $H \in \I$ and $K \subseteq H$, then $K \in \I$. Thus $\I$ satisfies
+(I2). We show that $\I$ satisfies (I3) by contradiction. Suppose $I_1$ and
+$I_2$ are elements of $\I$, and $|I_1| < |I_2|$. Assume that for all $e \in
+I_2 - I_1$, the set $I_1 \cup e \not\in \I$. This means that the set $I_1
+\cup e$ contains a cycle for all $e$. Since $I_1$ is itself acyclic, there
+is only one cycle in $I_1 \cup e$. Now, consider $I_1 \cup I_2$. This set has
+exactly $|I_2 - I_1|$ cycles, one for each $e \in I_2 - I_1$. Let $I_3$ be a
+maximal independent set in $I_1 \cup I_2$, obtained by removing an edge from
+each of the $|I_2 - I_1|$ cycles in $I_1 \cup I_2$. Now,
+\begin{align*}
+    |I_3| &= |I_1 \cup I_2| - |I_2 - I_1|\\
+    &= |I_1| + |I_2| - |I_1 \cap I_2| - |I_2 - I_1|\\
+    &= |I_1| + |I_2| - |I_1 \cap I_2| - (|I_2| + |I_1 \cap I_2|)\\
+    &= |I_1|.
+\end{align*}
+It follows that $|I_3| < |I_2|$, contradicting the maximality of $I_3$.
+Therefore, (I3) holds, and $M$ is indeed a matroid.
+\end{proof}
+\end{prp}
+
+A matroid derived from a graph $G$ is called a \emph{cycle matroid} and is
+denoted $M(G)$. Furthermore, given a subset $S$ of the vertex set of a graph
+$G$, we write $G[S]$ to denote the subgraph induced by $S$.
+
+Consider a collection $\B$ of maximal independent sets of a matroid $M$.
+Given the ground set $E$ of $M$ we can easily reconstruct the independents
+sets of $M$ as follows: The set $X$ is in $\I$ if and only if $X \subseteq
+B \in \B$. We call a maximal independent set of a matroid a \emph{base} or
+\emph{basis}.
+
+From our discussion of MSTs and \autoref{graphs-are-matroids}
+we can deduce that any spanning tree of a graph $G$ is a basis of the cycle
+matroid $M(G)$. Notice that this idea of a basis coincides with our idea
+of a basis from linear algebra. Like bases of a vector space, all spanning
+trees are equicardinal. Furthermore, if one ``fills in the cycles'' we can
+imagine that a spanning tree ``spans'' the graph, just as the span of a
+basis spans a vector space.
+
+\begin{prp}\label{bases-are-equicardinal}
+Let $\B$ be a collection of bases of a matroid $M = (E,\I)$. Then the elements
+of $\B$ are equicardinal.
+
+\begin{proof}
+Let $B_1$ and $B_2$ be elements of $\B$. Suppose $|B_1| < |B_2|$. Then by
+(I3), there exists a element $e \in B_2 - B_1$ such that $B_1 \cup e \in \I$.
+However, this contradicts the maximality of $B_1$. Therefore,
+$|B_1| \geq |B_2|$. Similarly, $|B_2| \geq |B_1|$. Thus $|B_1| = |B_2|$. Since
+$B_1$ and $B_2$ were chosen arbitrarily, all elements of $\B$ are equicardinal.
+\end{proof}
+\end{prp}
+
+The bases of a matroid $M$ also have a very attractive property, similar to the
+exchange property for independent sets, called the
+\emph{basis exchange property}.
+
+\begin{prp}\label{basis-exchange}
+Let $\B$ be a collection of bases of a matroid $M = (E,\I)$. If $B_1$ and
+$B_2$ are elements of $\B$ and $x \in B_1 - B_2$, then there exists an element
+$y \in B_2 - B_1$ such that $(B_1 - x) \cup y \in \B$.
+
+\begin{proof}
+Consider $B_1 - x \subset B_1$. Then $B_1 - x$ is independent by (I2). Now,
+$|B_1 - x| < |B_2|$ by \autoref{bases-are-equicardinal}. Thus, there exists an
+element $y \in B_2 - B_1$ such that $(B_1 - x) \cup y \in \I$ by (I3). Since
+$|(B_1 - x) \cup y| = |B_1|$ and all bases are equicardinal, there cannot
+exist an independent set containing $(B_1 - x) \cup y$. Thus $(B_1 - x) \cup
+y \in \B$.
+\end{proof}
+\end{prp}
+%% Lemmas instead of propositions?
+
+%% For completness, should be noted that bases characterize matroids if
+%% B satisfies (B1) and (B2).
+
+In the next section, we link the bases of matroids to solutions to a general
+class of combinatorial optimization problemes. We then explore solutions to to
+these problems using greedy strategies.
+
 \section{Greedy Algorithms and Matroids}
 
-\section{Optimality}
+Let us now define more precisely what it means for a problem to be a
+combinatorial optimization problem. As we mentioned earlier, combinatorial
+optimization problems deal with finding an optimal object among a large set of
+objets.
 
-\section{Example: Kruskals Algorithm}
+\begin{defn}
+Let $\I$ be a collection of subsets of a set $E$. Define $w$ as a function from
+$E$ to $\mathbb{R}$, where
+\begin{align*}
+w(X) &= \sum_{x \in X}{w(x)}
+\end{align*}
+for all $X \subseteq E$. We call $w(X)$ the \emph{weight} of $X$.
 
-% -- temp
-\nocite{*}
+An \emph{optimization problem} for a pair $(\I,w)$ is the problem of finding a
+maximal element $S$ of $\I$ such that $S$ has minimal weight.
+\end{defn}
+
+We call the a maximal element with minimum weight a \emph{solution} to an
+optimization problem.
+
+It is easy to see how this definition encapsulates our intuition about
+combinatorial optimization problems. Because $\I$ is a collection of subsets of
+a set, it is plausible that $\I$ could become exponential in $E$, and thus very
+large. Specifically, in the worst case, if $\I = \mathcal{P}(E)$ then
+$|\I| = 2^{|E|}$, which grows exponentially in the size of $E$.
+
+For example, the TSP corresponds to the optimization problem where $\I$ is a
+collection of subsets of the edge set of a graph $G = (V,E,w)$ which form a
+circuit, and $w$ is simply the weight function of $G$. In this optimization
+problem, a maximal element of $\I$ would be Hamiltonian circuit, and a solution
+to $(\I,w)$ would be a Hamiltonian circuit of minimal weight.
+
+% mention polytime algorithms and efficiency?
+
+
+
+\section{Conclusions and Further Discussion}
 
 \clearpage
 \bibliographystyle{plain}
