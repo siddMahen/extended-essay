@@ -1,48 +1,48 @@
-This is BibTeX, Version 0.99d (TeX Live 2012)
+This is BibTeX, Version 0.99d (TeX Live 2013)
 Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: doc.aux
 The style file: plain.bst
 Database file #1: doc.bib.bib
 Warning--there's a number but no volume in greedy-tsp
-You've used 3 entries,
+You've used 4 entries,
             2118 wiz_defined-function locations,
-            517 strings with 4434 characters,
-and the built_in function-call counts, 912 in all, are:
-= -- 84
-> -- 48
+            522 strings with 4539 characters,
+and the built_in function-call counts, 1108 in all, are:
+= -- 105
+> -- 55
 < -- 0
-+ -- 19
-- -- 16
-* -- 65
-:= -- 165
-add.period$ -- 9
-call.type$ -- 3
-change.case$ -- 16
++ -- 22
+- -- 18
+* -- 72
+:= -- 205
+add.period$ -- 12
+call.type$ -- 4
+change.case$ -- 21
 chr.to.int$ -- 0
-cite$ -- 4
-duplicate$ -- 35
-empty$ -- 70
-format.name$ -- 16
-if$ -- 183
+cite$ -- 5
+duplicate$ -- 43
+empty$ -- 85
+format.name$ -- 18
+if$ -- 222
 int.to.chr$ -- 0
-int.to.str$ -- 3
+int.to.str$ -- 4
 missing$ -- 5
-newline$ -- 18
-num.names$ -- 6
-pop$ -- 21
+newline$ -- 23
+num.names$ -- 8
+pop$ -- 24
 preamble$ -- 1
-purify$ -- 14
+purify$ -- 17
 quote$ -- 0
-skip$ -- 17
+skip$ -- 22
 stack$ -- 0
-substring$ -- 34
+substring$ -- 39
 swap$ -- 3
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 8
+type$ -- 12
 warning$ -- 1
-while$ -- 8
-width$ -- 4
-write$ -- 36
+while$ -- 10
+width$ -- 5
+write$ -- 47
 (There was 1 warning)

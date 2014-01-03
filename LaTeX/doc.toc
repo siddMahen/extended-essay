@@ -1,6 +1,6 @@
 \contentsline {section}{\numberline {1}Introduction}{1}{section.0.1}
 \contentsline {section}{\numberline {2}The MSTP and Kruskal's Algorithm}{2}{section.0.2}
-\contentsline {section}{\numberline {3}Matroid Theory}{3}{section.0.3}
-\contentsline {section}{\numberline {4}Greedy Algorithms and Matroids}{5}{section.0.4}
-\contentsline {section}{\numberline {5}Conclusions and Further Discussion}{6}{section.0.5}
-\contentsline {section}{References}{7}{section*.1}
+\contentsline {section}{\numberline {3}Matroid Theory}{4}{section.0.3}
+\contentsline {section}{\numberline {4}Greedy Algorithms and Matroids}{6}{section.0.4}
+\contentsline {section}{\numberline {5}Conclusions and Further Discussion}{11}{section.0.5}
+\contentsline {section}{References}{12}{section*.4}

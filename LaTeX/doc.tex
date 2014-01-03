@@ -10,20 +10,24 @@
     shrink=20,%
 ]{microtype}
 
-% enable french spacing?
-% yes, extra spacing is almost unnoticable yet allows
-% the reader the slightest pause between sentances.
-
 % -- Misc. --
+\usepackage[plain]{fancyref}
 \usepackage{aliascnt}
 \usepackage{hyperref}
 \usepackage{color}
 \usepackage{array}
 \usepackage{url}
 
+\usepackage{tikz}
+\usetikzlibrary{arrows,petri,topaths}
+\usepackage{tkz-berge}
+
+\usepackage[labelfont=bf]{caption}
+\usepackage{subcaption}
+
 % -- TOC --
 \usepackage[nottoc,section]{tocbibind}
-\usepackage{tocloft}
+\usepackage[titles]{tocloft}
 
 % -- Math --
 \usepackage[mathscr]{eucal}
@@ -38,9 +42,11 @@
 \newaliascnt{lem}{thm}
 \newaliascnt{prp}{thm}
 \newaliascnt{defn}{thm}
+\newaliascnt{cor}{thm}
 
 \newtheorem{lem}[lem]{Lemma}
 \newtheorem{prp}[prp]{Proposition}
+\newtheorem{cor}[cor]{Corollary}
 
 % fix the definition style to bold the note text properly
 \newtheoremstyle{definition}%
@@ -52,9 +58,12 @@
 
 \aliascntresetthe{lem}
 \aliascntresetthe{prp}
+\aliascntresetthe{cor}
 \aliascntresetthe{defn}
 
 \providecommand*{\lemautorefname}{Lemma}
+\providecommand*{\thmautorefname}{Theorem}
+\providecommand*{\corautorefname}{Corollary}
 \providecommand*{\prpautorefname}{Proposition}
 \providecommand*{\defnautorefname}{Definition}
 
@@ -62,84 +71,75 @@
 \newcommand{\I}{\mathcal{I}}
 \newcommand{\B}{\mathscr{B}}
 
-% -- Tables --
-\usepackage{booktabs}
-
-% -- Graphics --
-\usepackage{pgfplots}
-
 \begin{document}
 
-\title{Matroids and Greedy Algorithms}
-\author{Siddharth Mahendraker}
+\title{On the Characterization of Combinatorial Optimization Problems Soluble Using Greedy Strategies}
+\author{Siddharth Mahendraker\\
+    \url{siddharth.mahen@gmail.com}}
 
 \maketitle
 
 \begin{abstract}
-In this paper, we examine the necessary and sufficient conditions for a
-greedy algorithm strategy to be successful for a given combinatorial
-optimization problem. This is done through the study of matroids and their
-properties. We show that a greedy algorithm is successful for a given problem
-if and only if the problem has can be formulated as a matroid.
+In this paper, we examine the necessary and sufficient conditions for a greedy
+algorithm strategy to be successful for a given combinatorial optimization
+problem. This is done through the study of matroids and their properties. We
+show that a greedy algorithm is successful for a given problem if and only if
+the problem has can be formulated as a matroid.
 \end{abstract}
 
 % -- Bookkeeping --
 \setcounter{secnumdepth}{3}
 \renewcommand{\thesection}{\arabic{section}}
+\settocbibname{References}
 
 % -- TOC --
 \renewcommand{\cfttoctitlefont}{\Large\bfseries}
 \setlength\cftaftertoctitleskip{1em}
-
 \setlength\cftbeforesecskip{0.5em}
-
-\settocbibname{References}
 
 \setcounter{page}{1}
 \pagenumbering{roman}
-
 \tableofcontents
 \clearpage
-
 \setcounter{page}{1}
 \pagenumbering{arabic}
 
 % -- Introduction --
 \section{Introduction}
 
-Combinatorial optimization is a mathematical framework for finding optimal
-objects amongst a large set of objects. A famous example of a combinatorial
-optimization problem is the travelling salesman problem, or TSP\@. Assume a
-salesman has a list of cities he wants to visit, and knows the distance between
-various pairs of cities. The TSP asks: What is the shortest path which takes
-the salesman through each city once and back to his starting point? Here, the
-optimal object is a shortest path which passes through each city once and
-returns the salesman to his point of departure, and the set of objects is the
-set of all paths which can be taken. To see why this problem could be
-difficult, assume that every city is connected to every other city and we want
-to check all the paths to find the shortest one. If we fix a city of departure,
-there are $n-1$ cities left to go to, where $n$ is the total number of cities.
-Each of these choices represents a different path the salesman could take. In
-the next city, there are $n-2$ cities left to go to, and so on. It turns out,
-given $n$ cities there are $(n-1)!/2$ unique paths which reach every city and
-return the salesman to his point of departure. Even for relatively small values
-of $n$, the number of possible paths is enormous; far larger than anything even
-a computer could hope to check. Consider for example the choice of $n = 64$. In
-this case, there are over $10^{86}$ possible paths to check! More paths than
-there are atoms in the universe! Using combinatorial optimization techniques,
-however, we can significantly reduce the amount of work needed to find an
-optimal path.  Indeed, to date, instances of the TSP have been solved with tens
-of thousands of cities.
+Combinatorial optimization is a mathematical field concerned with efficiently
+finding certain optimal objects among a large set of objects. A famous example
+of a combinatorial optimization problem is the travelling salesman problem, or
+TSP\@. Assume a salesman has a list of cities he wants to visit, and knows the
+distance between various pairs of cities. The TSP asks: What is the shortest
+path which takes the salesman through each city once and back to his starting
+point? Here, the optimal object is a shortest path which passes through each
+city once and returns the salesman to his point of departure, and the set of
+objects is the set of all paths which can be taken.  To see why this problem
+could be difficult, assume that every city is connected to every other city and
+we want to check all the paths to find the shortest one. If we fix a city of
+departure, there are $n-1$ cities left to go to, where $n$ is the total number
+of cities.  Each of these choices represents a different path the salesman
+could take. In the next city, there are $n-2$ cities left to go to, and so on.
+It turns out, given $n$ cities there are $(n-1)!/2$ unique paths which reach
+every city and return the salesman to his point of departure. Even for
+relatively small values of $n$, the number of possible paths is enormous; far
+larger than anything even a computer could hope to check. Consider for example
+the choice of $n = 64$. In this case, there are over $10^{86}$ possible paths
+to check! More paths than there are atoms in the universe! Using combinatorial
+optimization techniques, however, we can significantly reduce the amount of
+work needed to find an optimal path.  Indeed, to date, instances of the TSP
+have been solved with tens of thousands of cities.
 
 One particular strategy often used in combinatorial optimization is the greedy
 optimization strategy, or greedy algorithm. The greedy algorithm attempts to
-find the optimal object by making successive locally optimal decisions, in the
+find an optimal object by making successive locally optimal decisions, in the
 hopes that this will lead to a globally optimal solution. For example, a greedy
 algorithm for the TSP could work as follows: Fix the city of departure.  To
 reach another city, pick the shortest route out of the current city which leads
 to an unvisited city. Repeat until you return to the city of departure.
 Unfortunately, greedy strategies are often non-optimal. In the case of the TSP,
-this particular greedy algorithm will not yield the optimal path, and in
+this particular greedy algorithm will not always yield the optimal path, and in
 certain situations, can in fact give the worst possible solution. More
 generally, it is known that greedy algorithms are far from optimal for most
 instances of the TSP \cite{greedy-tsp}.
@@ -149,10 +149,10 @@ instances of the TSP \cite{greedy-tsp}.
 However, for certain combinatorial optimization problems, greedy algorithms can
 be very useful. If they can be proven to be correct, greedy algorithms are
 often far simpler to implement than other combinatorial optimization
-strategies, such as dynamic programming. Furthermore, they often consume less
-resources when implemented on a computer and thus run faster and more
-efficiently. Therefore, knowing when a greedy algorithm can be applied is very
-useful.
+strategies, such as dynamic programming (see \cite[pp. 378--387]{clrs} for more
+information). Furthermore, they often consume less resources when implemented
+on a computer and thus run faster and more efficiently. Therefore, knowing when
+a greedy algorithm can be applied is very useful.
 
 In this paper, we examine the necessary and sufficient conditions required for
 a greedy algorithm strategy to be successful for a given combinatorial
@@ -163,36 +163,42 @@ strategies.
 The remainder of this paper will proceed as follows. First, we give an example
 of an successful greedy algorithm by examining the minimum spanning tree
 problem and Kruskal's algorithm. Next we introduce matroids and discuss their
-various forms and properties. Then we link certain properties of matroids to
+various forms and properties. Then, we link certain properties of matroids to
 solutions to a general class of combinatorial optimization problems. Finally,
-we show that these solutions can be obtained through greedy stratagies.
+we show that these solutions can be obtained through greedy strategies.
+
+This paper assumes some familiarity with graph theory and basic linear
+algebra. Throughout the paper, we use standard notation from graph theory.
+For details, see \cite[pp. 1--6]{matroid-theory}. Note that unless otherwise
+indicated, all proofs in this paper are original.
 
 %% Better outline...
 
 \section{The MSTP and Kruskal's Algorithm}
 
-Another well known problem in combinatorial optimization is the minimum
-spanning tree problem, or MSTP\@. Given a weighted graph $G = (V,E,w)$, the
-MSTP asks us to find an acyclic subgraph $H = (V,E',w)$ of $G$, such that $H$
-contains all the vertices of $G$ and the weight of $H$, $w(H) = \sum_{e \in
-E'}{w(e)}$ is minimal.
+Recall that a \emph{spanning tree} $T$ of a graph $G$ is a connected, acyclic
+subgraph of $G$ which contains all the vertices of $G$. Given a weighted graph
+$G = (V,E,w)$, the minimum spanning tree problem (MSTP) asks us to find a
+spanning tree $T$ of $G$, such that $T$ has minimal weight.
 
-Unlike the TSP, the MSTP can be solved with a simple and elegant algorithm,
-due to Kruskal \cite{clrs}.
+Unlike the TSP, the MSTP can be solved with a simple and elegant algorithm, due
+to Kruskal \cite[pp. 631--633]{clrs}.
 
-% comma necessary here?
+%Kruskal's algorithm works by always
+%adding the lightest unpicked edge to the spanning tree, as long as this edge
+%does not create any cycles.
 
 \begin{defn}[Kruskal's Algorithm]
-Given a graph $G = (V,E,w)$, the minimum spanning tree $T^*$ of
+Given a connected graph $G = (V,E,w)$, the minimum spanning tree $T^*$ of
 $G$ can be computed as follows:
 \begin{enumerate}
     \item Begin with an empty set $T := \emptyset$.
     \item Until $|T| = |V| - 1$, repeat steps 3 and 4 below.
-    \item Select a minimum cost edge $e$ in $E - T$, breaking ties
+    \item Select a minimum weight edge $e$ in $E - T$, breaking ties
     arbitrarily.
     \item If $T \cup e$ is acyclic, set $T := T \cup e$. Otherwise discard
     the edge $e$ and never consider it again.
-    \item Output a minimum spanning tree $T^* = (V,T,w)$.
+    \item Output a minimum spanning tree $T^* = (V,T,w)$ and stop.
 \end{enumerate}
 \end{defn}
 
@@ -203,33 +209,54 @@ Clearly, Kruskal's algorithm is greedy. At every step, the algorithm
 selects a minimum weight edge in $G$, and attempts to add it to the edge set
 of the output spanning tree.
 
-%% Give an example of Kruskal's algorithm at work
-
 \begin{defn}
 An algorithm is called a \emph{greedy algorithm} if it makes a locally optimal
 decision at each step.
 \end{defn}
 
 Kruskal's algorithm shows how efficient greedy algorithms can be, given the
-correct problem structure. Intuitively, Kruskal's algorithm works because
-given any subset $S$ of the vertex set of a graph $G$, an MST of
-the subgraph induced by $S$ will always be a part of an MST of $G$.
-Furthermore, if an edge $e$ is a minimum weight edge across all edges, it
-must be part of some MST of $G$.
+correct problem structure. The algorithm works because the MSTP has two
+properties which immideately allow us to identify edges which are part of an
+MST of $G$, and edges which are not \cite[pp. 10--11]{eisner}. Let us call a
+partition of $G$ into two disjoint sets $A$ and $B$ a cut $(A,B)$ of $G$. The
+first property says that an edge $e \in E$ is part of the MST of $G$ if and
+only $e$ is the lightest edge across some cut of $G$. This is called the cut
+property. The second property says that an edge $e \in E$ is not part of the
+MST of $G$ if and only if $e$ is the heaviest edge in some cycle of $G$. This
+is called the cycle property.  Because Kruskal's algorithm adds edges from
+lightest to heaviest, if an edge $e \in E - T$ is being considered by the
+algorithm it must be the lightest edge across some cut, unless it creates a
+cycle in $T^* = (V,T,w)$, in which case it is the heaviest edge in some cycle.
+Since one of these possibilites always holds, Kruskal's algorithm always
+returns a MST of $G$.
 
-In the next section we introduce matroids, which generalize certain properties
-of the MSTP mentioned above. We will revisit Kruskal's algorithm in
-subsequent sections and provide a more rigorous proof of correctness using
-matroid theory.
+% The point is to try and expose the matroid structure here, where MSTs are
+% basis of cycle matroids with lowest weight, which you can find
+% by selecting min weight elements and making sure they're independent.
 
-%Intuitively, Kruskal's algorithm works because if $e$ is a minimum cost edge
-%across all edges, it must be part of some MST of $G$. If we assume all the
-%edges of $G$ have distinct weights, we can order the edges like so:
-%$e_1 < e_2 < \ldots < e_{n-1} < e_n$. Then, we simply need to select a set of
-%lowest cost edges in this ordering which do not create a cycle, and span the
-%vertex set. This essentially solves the MSTP\@. We will prove the correctness
-%of Kruskal's algorithm more rigorously using matroid theory in subsequent
-%sections.
+% Old
+%Kruskal's algorithm shows how efficient greedy algorithms can be, given
+%the correct problem structure. Intuitively, Kruskal's algorithm works because
+%given any subset S of the vertex set of a graph G, an MST of the subgraph
+%induced by S will always be a part of an MST of G. Furthermore, if an edge
+%e is a minimum weight edge across all edges, it must be part of some MST
+%of G.
+%
+
+\input{examples/kruskal-example.tex}
+
+%the text below is slightly incorrect, matroids dont generalize properties of
+%the MSTP, optimization problems based on matroid theory generalize
+%the MSTP
+
+%something along the lines of in next section, we introduce matroids, which will
+%allow us reason about a large class of optimization problems with properties
+%similar to those of the MSTP, mentioned above. We will then revisit...
+
+In the next section we introduce matroids, which allow us to reason about a
+large class of optimization problems with useful properties similar to those of
+the MSTP mentioned above. We will revisit Kruskal's algorithm in subsequent
+sections and give a more rigorous proof of correctness using matroid theory.
 
 \section{Matroid Theory}
 
@@ -265,13 +292,16 @@ the members of $\I$ the \emph{independent sets} of $M$. A subset $S$ of $E$
 which is not in $\I$ is called a \emph{dependent set}. We also call (I2)
 the \emph{hereditary property} and (I3) the \emph{exchange property}.
 
-From this definition, we can already intuitively see that matroids
-encapsulate lots of structure which is important in solving combinatorial
-optimization problems. Specifically, (I2) and (I3) are reminiscent of the
-overlapping subproblem structure and optimal substructure exploited by
-dynamic programming algorithms \cite{clrs}. That is, we are guaranteed
-that all subsets of an independent set are themselves independent, and that
-we can always build larger independent sets from smaller ones.
+From this definition, we can already intuitively see that matroids encapsulate
+lots of structure which is important when solving combinatorial optimization
+problems. Specifically, (I2) and (I3) are reminiscent of the overlapping
+subproblem structure and optimal substructure exploited by dynamic programming
+algorithms \cite{clrs}. These conditions imply that we are guaranteed that all
+subsets of an independent set are themselves independent, and that we can
+always build larger independent sets from smaller ones\footnotemark.
+
+\footnotetext{Until we build a maximal independent set, at which point no more
+elements can be exchanged via (I3).}
 
 \begin{prp}\label{graphs-are-matroids}
 Let $G = (V,E)$ be a graph and let $\I$ be the set of subsets of $E$ which
@@ -284,14 +314,15 @@ that if $H \in \I$ and $K \subseteq H$, then $K \in \I$. Thus $\I$ satisfies
 $I_2$ are elements of $\I$, and $|I_1| < |I_2|$. Assume that for all $e \in
 I_2 - I_1$, the set $I_1 \cup e \not\in \I$. This means that the set $I_1
 \cup e$ contains a cycle for all $e$. Since $I_1$ is itself acyclic, there
-is only one cycle in $I_1 \cup e$. Now, consider $I_1 \cup I_2$. This set has
-exactly $|I_2 - I_1|$ cycles, one for each $e \in I_2 - I_1$. Let $I_3$ be a
-maximal independent set in $I_1 \cup I_2$, obtained by removing an edge from
-each of the $|I_2 - I_1|$ cycles in $I_1 \cup I_2$. Now,
+is only one cycle in $I_1 \cup e$, and this cycle must contain $e$. Now,
+consider $I_1 \cup I_2$. This set has exactly $|I_2 - I_1|$ cycles, one for
+each $e \in I_2 - I_1$. Let $I_3$ be a maximal independent set in
+$I_1 \cup I_2$, obtained by removing an edge from each of the $|I_2 - I_1|$
+cycles in $I_1 \cup I_2$. Now,
 \begin{align*}
     |I_3| &= |I_1 \cup I_2| - |I_2 - I_1|\\
     &= |I_1| + |I_2| - |I_1 \cap I_2| - |I_2 - I_1|\\
-    &= |I_1| + |I_2| - |I_1 \cap I_2| - (|I_2| + |I_1 \cap I_2|)\\
+    &= |I_1| + |I_2| - |I_1 \cap I_2| - (|I_2| - |I_1 \cap I_2|)\\
     &= |I_1|.
 \end{align*}
 It follows that $|I_3| < |I_2|$, contradicting the maximality of $I_3$.
@@ -303,19 +334,20 @@ A matroid derived from a graph $G$ is called a \emph{cycle matroid} and is
 denoted $M(G)$. Furthermore, given a subset $S$ of the vertex set of a graph
 $G$, we write $G[S]$ to denote the subgraph induced by $S$.
 
-Consider a collection $\B$ of maximal independent sets of a matroid $M$.
-Given the ground set $E$ of $M$ we can easily reconstruct the independents
-sets of $M$ as follows: The set $X$ is in $\I$ if and only if $X \subseteq
-B \in \B$. We call a maximal independent set of a matroid a \emph{base} or
-\emph{basis}.
+\input{examples/cycle-matroid-example}
 
-From our discussion of MSTs and \autoref{graphs-are-matroids}
-we can deduce that any spanning tree of a graph $G$ is a basis of the cycle
-matroid $M(G)$. Notice that this idea of a basis coincides with our idea
-of a basis from linear algebra. Like bases of a vector space, all spanning
-trees are equicardinal. Furthermore, if one ``fills in the cycles'' we can
-imagine that a spanning tree ``spans'' the graph, just as the span of a
-basis spans a vector space.
+Consider a collection $\B$ of maximal independent sets of a matroid $M$.
+Given the ground set $E$ of $M$ we can easily reconstruct the independent
+sets of $M$ as follows: The set $X$ is in $\I$ if and only if $X \subseteq
+B$ for some $B \in \B$. We call a maximal independent set of a matroid a
+\emph{base} or \emph{basis}.
+
+From our discussion of MSTs and \autoref{graphs-are-matroids} we can deduce
+that any spanning tree of a graph $G$ is a basis of the cycle matroid $M(G)$.
+Notice that this idea of a basis coincides with our idea of a basis from linear
+algebra. Like bases of a vector space, all spanning trees are equicardinal.
+Furthermore, if one ``fills in the cycles'' we can imagine that a spanning tree
+``spans'' the graph, just as the span of a basis spans a vector space.
 
 \begin{prp}\label{bases-are-equicardinal}
 Let $\B$ be a collection of bases of a matroid $M = (E,\I)$. Then the elements
@@ -354,7 +386,7 @@ y \in \B$.
 %% B satisfies (B1) and (B2).
 
 In the next section, we link the bases of matroids to solutions to a general
-class of combinatorial optimization problemes. We then explore solutions to to
+class of combinatorial optimization problems. We then explore solutions to to
 these problems using greedy strategies.
 
 \section{Greedy Algorithms and Matroids}
@@ -362,40 +394,282 @@ these problems using greedy strategies.
 Let us now define more precisely what it means for a problem to be a
 combinatorial optimization problem. As we mentioned earlier, combinatorial
 optimization problems deal with finding an optimal object among a large set of
-objets.
+objects.
 
 \begin{defn}
 Let $\I$ be a collection of subsets of a set $E$. Define $w$ as a function from
-$E$ to $\mathbb{R}$, where
+$E$ to $\mathbb{R}^{\geq 0}$, where
 \begin{align*}
 w(X) &= \sum_{x \in X}{w(x)}
 \end{align*}
 for all $X \subseteq E$. We call $w(X)$ the \emph{weight} of $X$.
 
-An \emph{optimization problem} for a pair $(\I,w)$ is the problem of finding a
+An \emph{optimization problem} for a triple $(E,\I,w)$ is the problem of finding a
 maximal element $S$ of $\I$ such that $S$ has minimal weight.
 \end{defn}
 
-We call the a maximal element with minimum weight a \emph{solution} to an
-optimization problem.
+We call a maximal element with minimum weight a \emph{solution} to an
+optimization problem. If an algorithm always finds a solution to a
+combinatorial optimization problem $P$, we say the algorithm solves $P$.
 
 It is easy to see how this definition encapsulates our intuition about
 combinatorial optimization problems. Because $\I$ is a collection of subsets of
 a set, it is plausible that $\I$ could become exponential in $E$, and thus very
-large. Specifically, in the worst case, if $\I = \mathcal{P}(E)$ then
-$|\I| = 2^{|E|}$, which grows exponentially in the size of $E$.
+large. Specifically, in the worst case if $\I = \mathcal{P}(E)$, the power set
+of $E$, then $|\I| = 2^{|E|}$, which grows exponentially in the size of $E$.
+This means that finding a maximal element $S$ of $I$ with minimal weight could
+become exponentially difficult.
 
 For example, the TSP corresponds to the optimization problem where $\I$ is a
-collection of subsets of the edge set of a graph $G = (V,E,w)$ which form a
-circuit, and $w$ is simply the weight function of $G$. In this optimization
-problem, a maximal element of $\I$ would be Hamiltonian circuit, and a solution
-to $(\I,w)$ would be a Hamiltonian circuit of minimal weight.
+collection of subsets of the edge set of a graph $G = (V,E,w)$ which do not
+form cycles or are Hamiltonian cycles, and $w$ is simply the weight function of
+$G$. In this optmization problem, a maximal element of $\I$ would be a
+Hamiltonian cycle, and a solution to $(E,\I,w)$ would be Hamiltonian cycle of
+minimal weight.
 
-% mention polytime algorithms and efficiency?
+Given this definition of a combinatorial optimization problem, we can now
+define a general greedy algorithm which attempts to find a solution to
+arbitrary combinatorial optimization problems.
 
+\begin{defn}[Generalized Greedy Algorithm]
+Given a combinatorial optimization problem $P = (E,\I,w)$, a potential solution
+to $P$ can be computed as follows:
 
+\begin{enumerate}
+    \item Begin with an empty set $X := \emptyset$.
+    \item Select a minimum weight element $e \in E - X$, such that $X \cup e
+          \in \I$. If such an element exists, set $X := X \cup e$. Otherwise,
+          output $X$ and stop.
+    \item Repeat the previous step until the algorithm stops.
+\end{enumerate}
+\end{defn}
+
+We abbreviate the generalized greedy algorithm to GGA.
+
+Clearly, the GGA is greedy. At every step, the algorithm makes a locally
+optimal decision by selecting an element of minimum weight. Since $E$ is
+finite and the algorithm adds one element in $E - X$ to $X$ at every step,
+the algorithm must stop in a finite number of steps. Furthermore, because
+$X$ is only augmented when $X \cup e$ is an element of $\I$, the output $X$
+is also an element of $\I$. Thus, it is plausible that the GGA solves some
+combinatorial optimization problems.
+
+Incredibly, it can be shown that if $(E,\I)$ is a matroid, then the solution to
+the combinatorial problem $(E,\I,w)$ is given by the output of the generalized
+greedy algorithm! This follows from the fact that $X$ can always be augmented
+using the exchange property until it becomes a basis in $\I$, and that the
+algorithm only selects minimum weight elements to add to $X$.
+
+\begin{thm}\label{GGA-solves-matroids}
+Let $M = (E,\I)$ be a matroid, and let $P = (E,\I,w)$ be a combinatorial
+optimization problem. Then the generalized greedy algorithm solves $P$.
+
+\begin{proof}
+
+Let $X$ be the output of the GGA given $P$. We show that $X$ is a maximal
+element of $\I$. At every step of the algorithm, $|X| < |E|$. If $|X| = |E|$,
+then the algorithm must terminate, as $E - X$ would be empty. Furthermore, at
+every step of the algorithm, $X$ is independent. This is because $X$ is
+initialized to the empty set, and at every subsequent step $X$ is augmented
+such that $X$ remains in $\I$. Therefore, by (I3), we can always increase the
+cardinality of $X$ by one in each step of the algorithm. Suppose the bases of
+$M$ have cardinality $r$.  Since the cardinality of $X$ is initially $0$, and
+at every step we increase the cardinality of $X$ by one, $X$ will be a basis of
+$M$ after $r$ steps. Thus, the output of the GGA is a maximal element of $\I$.
+
+Now, let $Y$ be a maximal element of $\I$ with minimal weight, i.e.\ a solution
+to $P$. We show that $X$ has minimal weight. Since both $X$ and $Y$ are bases
+of $\I$, we can exchange an element $x \in X - Y$ with an element $y \in Y - X$
+to form a new basis $(X - x) \cup y$ by \autoref{basis-exchange}. This new
+basis has weight lower than the weight of $X$ if and only if $w(y) < w(x)$. We
+show this to be false. Let $X' \subset X$ be the elements of $X$ chosen before
+$x$ was chosen. Because the GGA chose $x$, this implies $x$ had lower weight
+than any other element in $E - X'$. However, $Y - X \subset Y - X' \subset E -
+X'$. Thus, as $y \in Y - X$ it follows that $w(x) \leq w(y)$. Therefore, $w(X)
+\leq w((X - x) \cup y)$. Let $X_1 = (X - x) \cup y$. We can form a chain of
+alternate bases $X_{i+1}$ of $\I$ by exchanging elements between $X_i$ and $Y$,
+where $i \in \{1,2,\ldots,k\}$. After every exchange, we can use a similar
+argument to show that $w(X_i) \leq w(X_{i+1})$. This process will stop when we
+have exchanged all the elements of $X - Y$ and $Y - X$, at which point $X_k =
+Y$. Now, since $w(X_i) \leq w(X_{i+1})$ at every link in the chain, this
+implies
+\begin{align*}
+    w(X) \leq w(X_1) \leq w(X_2) \leq \cdots \leq w(X_{k - 1}) \leq w(Y).
+\end{align*}
+However, this contradicts the minimality of $Y$, and thus an equality must hold
+throughout. Therefore $w(X) = w(Y)$, and $X$ is indeed of minimal weight. Since
+$X$ is a maximal element of $\I$ with minimal weight it is a solution to $P$,
+and the GGA solves $P$.
+\end{proof}
+\end{thm}
+
+% fix the wording of the last line above
+
+Let us now reconsider Kruskal's algorithm and the MSTP in the context of
+combinatorial optimization problems. Fix a connected graph $G = (V,E,w)$. We
+can think of the MSTP as an optimization problem $(E,\I,w)$, where $\I$ is a
+collection of acyclic subsets of the edge set $E$ of $G$, and $w$ is simply the
+weight function of $G$. This problem also has a natural matroid structure,
+given by the cycle matroid $M(G)$ of $G$. Let us now compare Kruskal's
+algorithm to the GGA. If we can show that Kruskal's algorithm is somehow a
+special case of the GGA, its correctness comes for free by the previous
+theorem. For every edge $e$ added to the edge set $T$, Kruskal's algorithm
+checks to make sure $T \cup e$ is acyclic. This corresponds exactly to the
+independence check, $X \cup e \in \I$, executed by the GGA, where $\I$ is the
+independent set of $M(G)$. It is simple to see that the other aspects of the
+algorithm are also essentially equivalent. Thus, we can view Kruskal's
+algorithm as a special case of the GGA for cycle matroids. It follows from
+\autoref{GGA-solves-matroids} that Kruskal's algorithm solves the MSTP for $G$.
+
+\begin{cor}\label{kruskal-solves-MSTP}
+Let $G = (V,E,w)$ be a connected graph. Then Kruskal's algorithm solves the
+MSTP for $G$.
+\end{cor}
+
+\begin{defn}
+We say a combinatorial optimization problem $P = (E,\I,w)$ has \emph{matroid structure}
+if $M = (E, \I)$ is a matroid.
+\end{defn}
+
+So far, we have shown that the GGA solves all combinatorial optimization
+problems with an underlying matroid structure. It is natural to now ask what
+other combinatorial optimization problems, if any, the GGA is capable of
+solving. Perhaps counterintuitively, it can be shown that the GGA solves a
+combinatorial optimization problem if and only if the problem has a matroid
+structure.
+
+\begin{thm}\label{GGA-solves-only-matroids}
+Let $P = (E,\I,w)$ be a combinatorial optimization problem. Then $P$ has matroid
+structure if and only if $P$ satisfies the following conditions:
+\begin{description}
+    \item[(I1)] $\emptyset$ is in $\I$.
+    \item[(I2)] If $I \in \I$ and $I' \subseteq I$, then $I' \in
+                \I$.
+    \item[(G)]  The generalized greedy algorithm solves $P$ for all weight
+                functions $w:E \to \mathbb{R}^{\geq 0}$.
+\end{description}
+\begin{proof}
+
+Assume $P$ has matroid structure. Then $P$ satisfies (I1) and (I2) by
+definition. By \autoref{GGA-solves-matroids}, $P$ also satisfies (G).
+
+Conversely, assume $P$ satisfies (I1), (I2) and (G). We show by contradiction
+that $P$ satisfies (I3) also, and thus has matroid structure. Let $I_1$ and
+$I_2$ be elements of $\I$ such that $|I_1| < |I_2|$ and for all $x$ in $I_2 -
+I_1$, $I_1 \cup x \not\in \I$. We proceed by constructing a weight function $w:
+E \to \mathbb{R}^{\geq 0}$ under which the GGA fails to solve $P$.
+
+Let $r$ be the cardinality of a maximal element in $\I$ and let
+$w: E \to \mathbb{R}^{\geq 0}$ be a weight function defined by
+\begin{equation*}
+    w(x) = \left\{
+            \begin{array}{ll}
+                0 & \quad \text{if } x \in I_1\\
+                \dfrac{1}{2|I_2 - I_1|} & \quad \text{if } x \in I_2 - I_1\\
+                1 & \quad \text{if } x \in E - (I_1 \cup I_2)
+            \end{array}
+            \right.
+\end{equation*}
+
+Now, let $S$ be the solution to $P$ returned by the GGA. Given the weight
+function $w$ above, the GGA would first add all of $I_1$ to $S$. Next,
+the GAA would attempt to add the elements of $I_2$ to $S$, however, because
+$I_1 \cup x$ is dependent for all $x$ in $I_2$, the GGA would be forced to
+add the elements of $E - (I_1 \cup I_2)$ to $S$ instead. The solution
+returned by the GGA would therefore have weight
+\begin{equation*}
+    w(S) = 0(|I_1|) + 1(r - |I_1|) = r - |I_1|.
+\end{equation*}
+
+We now show that there exists a maximal element $S^*$ of $\I$ with weight lower
+than that of $S$. Let $S^* = (I_1 \cap I_2) \cup (I_2 - I_1) \cup X$, where
+$X$ is an arbitrary subset of $E - (I_1 \cup I_2)$ and $|X| = r - |I_2|$. The
+potential solution $S^*$ has weight
+\begin{align*}
+    w(S^*) &= 0(|I_1 \cap I_2|) + \left(\frac{1}{2|I_2 - I_1|}\right)|I_2 - I_1| + 1(r - |I_2|)\\
+    &= 1/2 + r - |I_2|
+\end{align*}
+
+Observe that because $|I_1|$ and $|I_2|$ can only take discrete values,
+$|I_2| - |I_1| \geq 1$. Now, we find that the difference $w(S) - w(S^*)$,
+\begin{align*}
+    w(S) - w(S^*) &= (r - |I_1|) - (1/2 + r - |I_2|)\\
+    &= |I_2| - |I_1| - 1/2\\
+    &\geq 1/2
+\end{align*}
+is bound from below by $1/2$. Thus $w(S^*) < w(S)$.
+
+However, this contradicts the minimality of $S$ as per condition (G).
+Therefore, (I3) holds and $P$ has matroid structure.
+\end{proof}
+\end{thm}
+
+This result is interesting for several reasons.
+
+First, it tells us something important about how much structure a black-box
+combinatorial optimization problems must have to be soluble. If we think of the
+generalized greedy algorithm as the simplest general method of solving
+combinatorial optimization problems, we see informally that it is in general
+very difficult to solve combinatorial optimization problems without knowing
+more about their internal structure. Indeed, unless we require that the
+problems have matroid structure, even the simplest general method will not be
+able to solve them.
+
+Second, this result allows us to quickly identify combinatorial optimization
+problems which can be solved using greedy strategies. When faced with a novel
+combinatorial optimization problem, this allows us to quickly determine
+whether it is worth pursuing more complex computational solutions or not.
+
+From an applied perspective, this result is important because it establishes
+that the generalized greedy algorithm solves every combinatorial optimization
+problem with matroid structure, and thus, one does not need to optimize several
+algorithms to solve different kinds of combinatorial optimization problems
+quickly.
+
+Finally, we see that \autoref{GGA-solves-only-matroids} provides a complete
+characterization of all combinatorial optimization problems soluble using
+greedy strategies. Namely, a combinatorial optimization problem is soluble
+if and only if it has a matroid structure.
+
+% note that we can actually prove a slighly stronger result: there exist an
+% infinite family of weight functions for which the GGA fails given (I3)
+% fails
+
+%% Intuitively, you want to say that it is natural that the GGA only solves
+%% problems with matroid structure because:
+%%      1. The alogorithm is weight function invariant
+%%      2. The algorithm is greedy, myopic, in a sense, it can't make
+%%          bad choices and change them retroactively.
+
+%% To add to below, potentially talk about how the GGA and the matroid fix
+%% the combinatorial optimization problem, and then how the GGA and the matroid
+%% fix the combinatorial optimization problem.
+%% In a way, we can think that the GGA and the comb. opt. prblm. fix the matroid,
 
 \section{Conclusions and Further Discussion}
+
+In conclusion, we have completely characterized the combinatorial optimization
+problems which are solube using greedy algorithm strategies. We have proven
+that greedy algorithm strategies solve combinatorial optimization problems if
+and only if these problems possess a matroid structure.
+
+Ofcourse, there are many more features of greedy strategies that we could explore
+in combinatorial optimization which are interesting from a combinatorial
+perspective as well as an applied perspective.
+
+One important question we can ask, for example, is how well the generalized
+greedy algorithm approximates the true solution to combinatorial optimization
+problems without matroid structure. For example, it is known that the greedy
+algorithm provides a fairly good solution to the knapsack problem in the general
+case.
+
+The generalized greedy algorithm is also often used to establish good initial
+conditions before a more specific algorithm is used to solve a combinatorial
+optimization problem. For example in graph coloring, a greedy strategy is often
+used to establish initial conditions before local search techniques are used.
+
+For a more indepth overview of greedy algorithm theory and matroid theory,
+we refer the reader to \cite{clrs} and \cite{matroid-theory}.
 
 \clearpage
 \bibliographystyle{plain}
