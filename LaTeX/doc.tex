@@ -75,16 +75,24 @@
 
 \title{On the Characterization of Combinatorial Optimization Problems Soluble Using Greedy Strategies}
 \author{Siddharth Mahendraker\\
-    \url{siddharth.mahen@gmail.com}}
+    \url{siddharth.mahen@gmail.com}\\\\
+    Candidate Number: 000652 -- 0016\\
+    School: International School of Helsinki\\
+    Word Count: 3900}
+
+\date{November 14, 2013}
 
 \maketitle
 
 \begin{abstract}
-In this paper, we examine the necessary and sufficient conditions for a greedy
-algorithm strategy to be successful for a given combinatorial optimization
-problem. This is done through the study of matroids and their properties. We
-show that a greedy algorithm is successful for a given problem if and only if
-the problem has can be formulated as a matroid.
+In this paper, we examine the necessary and sufficient conditions required for
+a greedy algorithm strategy to be successful for an arbitrary combinatorial
+optimization problem. This is done by studying matroids and their properties.
+We show that matroids are intimately connected to the solution of combinatorial
+optimization problems using greedy strategies. Finally, we conclude that a
+greedy algorithm is successful for a combinatorial optimization problem if and
+only if the optimization problem has matroid structure.\\\\
+Key terms: greedy algorithms, matroid theory, combinatorial optimization.
 \end{abstract}
 
 % -- Bookkeeping --
@@ -161,7 +169,7 @@ properties, which as we shall soon see, lead naturally to greedy algorithm
 strategies.
 
 The remainder of this paper will proceed as follows. First, we give an example
-of an successful greedy algorithm by examining the minimum spanning tree
+of a successful greedy algorithm by examining the minimum spanning tree
 problem and Kruskal's algorithm. Next we introduce matroids and discuss their
 various forms and properties. Then, we link certain properties of matroids to
 solutions to a general class of combinatorial optimization problems. Finally,
@@ -216,7 +224,7 @@ decision at each step.
 
 Kruskal's algorithm shows how efficient greedy algorithms can be, given the
 correct problem structure. The algorithm works because the MSTP has two
-properties which immideately allow us to identify edges which are part of an
+properties which immediately allow us to identify edges which are part of an
 MST of $G$, and edges which are not \cite[pp. 10--11]{eisner}. Let us call a
 partition of $G$ into two disjoint sets $A$ and $B$ a cut $(A,B)$ of $G$. The
 first property says that an edge $e \in E$ is part of the MST of $G$ if and
@@ -227,8 +235,9 @@ is called the cycle property.  Because Kruskal's algorithm adds edges from
 lightest to heaviest, if an edge $e \in E - T$ is being considered by the
 algorithm it must be the lightest edge across some cut, unless it creates a
 cycle in $T^* = (V,T,w)$, in which case it is the heaviest edge in some cycle.
-Since one of these possibilites always holds, Kruskal's algorithm always
-returns a MST of $G$.
+Since one of these possibilities always holds, Kruskal's algorithm always
+returns a MST of $G$. See \autoref{fig:kruskal-example} for an example of
+Kruskal's algorithm in action.
 
 % The point is to try and expose the matroid structure here, where MSTs are
 % basis of cycle matroids with lowest weight, which you can find
@@ -331,8 +340,8 @@ Therefore, (I3) holds, and $M$ is indeed a matroid.
 \end{prp}
 
 A matroid derived from a graph $G$ is called a \emph{cycle matroid} and is
-denoted $M(G)$. Furthermore, given a subset $S$ of the vertex set of a graph
-$G$, we write $G[S]$ to denote the subgraph induced by $S$.
+denoted $M(G)$. See \autoref{fig:cycle-matroid-example} for an example of a
+cycle matroid.
 
 \input{examples/cycle-matroid-example}
 
@@ -422,10 +431,13 @@ become exponentially difficult.
 
 For example, the TSP corresponds to the optimization problem where $\I$ is a
 collection of subsets of the edge set of a graph $G = (V,E,w)$ which do not
-form cycles or are Hamiltonian cycles, and $w$ is simply the weight function of
-$G$. In this optmization problem, a maximal element of $\I$ would be a
-Hamiltonian cycle, and a solution to $(E,\I,w)$ would be Hamiltonian cycle of
-minimal weight.
+form cycles or are Hamiltonian cycles\footnotemark, and $w$ is simply the
+weight function of $G$. In this optimization problem, a maximal element of $\I$
+would be a Hamiltonian cycle, and a solution to $(E,\I,w)$ would be Hamiltonian
+cycle of minimal weight.
+
+\footnote{A Hamiltonian cycle of a graph $G$ is a cycle of $G$ which touches
+every node in the graph exactly once.}
 
 Given this definition of a combinatorial optimization problem, we can now
 define a general greedy algorithm which attempts to find a solution to
@@ -649,11 +661,11 @@ if and only if it has a matroid structure.
 \section{Conclusions and Further Discussion}
 
 In conclusion, we have completely characterized the combinatorial optimization
-problems which are solube using greedy algorithm strategies. We have proven
+problems which are soluble using greedy algorithm strategies. We have proven
 that greedy algorithm strategies solve combinatorial optimization problems if
 and only if these problems possess a matroid structure.
 
-Ofcourse, there are many more features of greedy strategies that we could explore
+Of course, there are many more features of greedy strategies that we could explore
 in combinatorial optimization which are interesting from a combinatorial
 perspective as well as an applied perspective.
 
@@ -665,10 +677,10 @@ case.
 
 The generalized greedy algorithm is also often used to establish good initial
 conditions before a more specific algorithm is used to solve a combinatorial
-optimization problem. For example in graph coloring, a greedy strategy is often
+optimization problem. For example in graph colouring, a greedy strategy is often
 used to establish initial conditions before local search techniques are used.
 
-For a more indepth overview of greedy algorithm theory and matroid theory,
+For a more in depth overview of greedy algorithm theory and matroid theory,
 we refer the reader to \cite{clrs} and \cite{matroid-theory}.
 
 \clearpage
